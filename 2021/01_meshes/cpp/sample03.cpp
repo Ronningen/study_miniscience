@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 
   gmsh::model::mesh::generate(2);
 
-  gmsh::write("t3.msh");
+  gmsh::write("../trash/t3.msh");
 
   std::set<std::string> args(argv, argv + argc);
   if(!args.count("-nopopup")) gmsh::fltk::run();

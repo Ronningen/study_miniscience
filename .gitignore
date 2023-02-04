@@ -5,3 +5,5 @@
 *.vtk
 *.vtu
 *.pvd
+**/trash
+.vscode

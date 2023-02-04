@@ -121,7 +121,7 @@ int main(int argc, char **argv)
   gmsh::model::mesh::generate(2);
 
   // ... and save it to disk
-  gmsh::write("t1.msh");
+  gmsh::write("../trash/t1.msh");
 
   // Remember that by default, if physical groups are defined, Gmsh will export
   // in the output mesh file only those elements that belong to at least one
