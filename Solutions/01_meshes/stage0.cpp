@@ -14,14 +14,15 @@ int main(int argc, char **argv)
         subtask = atoi(argv[1]);
     
 
-    double lc = 1e-2, N = 1;
+    double size = 0.5;
+    int N = 2;
     if (argc > 2)
         N = atof(argv[2]);
-    double size = lc*N;
+    double lc = size/N;
 
 
     gmsh::initialize();
-    gmsh::model::add("t0");
+    gmsh::model::add("s0");
 
     switch (subtask)
     {
@@ -60,9 +61,9 @@ int main(int argc, char **argv)
         }
         case 2:
         {
-            gmsh::model::geo::addPoint(size,0,0,1);
-            gmsh::model::geo::addPoint(-size,0,0,2);
-            auto center = gmsh::model::geo::addPoint(0,0,0);
+            gmsh::model::geo::addPoint(size,0,0,lc,1);
+            gmsh::model::geo::addPoint(-size,0,0,lc,2);
+            auto center = gmsh::model::geo::addPoint(0,0,0,lc);
 
             gmsh::model::geo::addCircleArc(1, center, 2, 1);
             gmsh::model::geo::addCircleArc(2, center, 1, 2);
@@ -75,18 +76,21 @@ int main(int argc, char **argv)
         }
     case 3:
         {
-            gmsh::model::geo::addPoint(size,0,0,1);
-            gmsh::model::geo::addPoint(-size,0,0,2);
-            auto center = gmsh::model::geo::addPoint(0,0,0);
+            gmsh::model::geo::addPoint(size,0,0,lc,1);
+            gmsh::model::geo::addPoint(-size,0,0,lc,3);
+            gmsh::model::geo::addPoint(0,size,0,lc,2);
+            gmsh::model::geo::addPoint(0,-size,0,lc,4);
+            auto center = gmsh::model::geo::addPoint(0,0,0,lc);
 
             gmsh::model::geo::addCircleArc(1, center, 2, 1);
-            gmsh::model::geo::addCircleArc(2, center, 1, 2);
-            gmsh::model::geo::addCurveLoop({1,2}, 1);
+            gmsh::model::geo::addCircleArc(2, center, 3, 2);
+            gmsh::model::geo::addCircleArc(3, center, 4, 3);
+            gmsh::model::geo::addCircleArc(4, center, 1, 4);
+            gmsh::model::geo::addCurveLoop({1,2,3,4}, 1);
             gmsh::model::geo::addPlaneSurface({1}, 1);
 
-
-            gmsh::vectorpair vol;
-            gmsh::model::geo::extrude({{2,1}}, 0, 0, size, vol, {2,2}, {1,1});
+            gmsh::vectorpair vol; 
+            gmsh::model::geo::extrude({{2,1}}, 0, 0, size, vol, {}, {}, false);
 
             gmsh::model::geo::synchronize();
             gmsh::model::mesh::generate(3);
