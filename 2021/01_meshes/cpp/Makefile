@@ -7,4 +7,4 @@ clean:
 	for number in 1 2 3 4; do \
         rm -f ../trash/sample0$$number; \
     done
-	rm -f *msh
+	rm -f ../trash/*msh
