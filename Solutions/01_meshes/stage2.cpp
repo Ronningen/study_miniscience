@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 
     gmsh::merge("fish.stl");
 
-    gmsh::model::mesh::classifySurfaces(1, true, false);
+    gmsh::model::mesh::classifySurfaces(1.1, true, true, 1.3);
     gmsh::model::mesh::createGeometry();
 
     gmsh::vectorpair entities;
@@ -21,6 +21,7 @@ int main(int argc, char **argv)
     gmsh::model::geo::addVolume({gmsh::model::geo::addSurfaceLoop(surfs)});
 
     gmsh::model::geo::synchronize();
+    gmsh::option::setNumber("Mesh.MeshSizeFactor", 0.2);
     gmsh::model::mesh::generate(3);
 
     std::set<std::string> args(argv, argv + argc);
