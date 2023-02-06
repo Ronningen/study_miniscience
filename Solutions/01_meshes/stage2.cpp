@@ -8,9 +8,9 @@ int main(int argc, char **argv)
 
     gmsh::model::add("stl");
 
-    gmsh::merge("test_geometry.stl");
+    gmsh::merge("fish.stl");
 
-    gmsh::model::mesh::classifySurfaces(0.3, true, true, 0.6);
+    gmsh::model::mesh::classifySurfaces(1, true, false);
     gmsh::model::mesh::createGeometry();
 
     gmsh::vectorpair entities;
