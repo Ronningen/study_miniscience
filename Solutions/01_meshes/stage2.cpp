@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 
     gmsh::merge("fish.stl");
 
-    gmsh::model::mesh::classifySurfaces(1.1, true, true, 1.3);
+    gmsh::model::mesh::classifySurfaces(1, true, true);
     gmsh::model::mesh::createGeometry();
 
     gmsh::vectorpair entities;
@@ -21,8 +21,13 @@ int main(int argc, char **argv)
     gmsh::model::geo::addVolume({gmsh::model::geo::addSurfaceLoop(surfs)});
 
     gmsh::model::geo::synchronize();
-    gmsh::option::setNumber("Mesh.MeshSizeFactor", 0.2);
+    // gmsh::option::setNumber("Mesh.MeshSizeFactor", 0.2);
+    gmsh::option::setNumber("Mesh.CharacteristicLengthFromCurvature", 0.5);
+    gmsh::option::setNumber("Mesh.AngleToleranceFacetOverlap", 0.01);
+    gmsh::option::setNumber("Mesh.MinimumElementsPerTwoPi", 3);
     gmsh::model::mesh::generate(3);
+
+    gmsh::write("../trash/01_task_mesh.msh");
 
     std::set<std::string> args(argv, argv + argc);
     if (!args.count("-nopopup"))

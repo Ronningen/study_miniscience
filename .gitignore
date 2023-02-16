@@ -7,3 +7,5 @@
 *.pvd
 **/trash
 .vscode
+CMakeFiles/
+**.txt

@@ -179,7 +179,7 @@ int main()
 
     // Считаем STL
     try {
-        gmsh::merge("t13_data.stl");
+        gmsh::merge("2021/02_vtk/cpp/t13_data.stl");
     } catch(...) {
         gmsh::logger::write("Could not load STL mesh: bye!");
         gmsh::finalize();

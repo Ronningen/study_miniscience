@@ -7,7 +7,7 @@ class CalcMesh:
     # Конструктор сетки size x size x size точек с шагом h по пространству
     def __init__(self, size, step):
         # 3D-сетка из расчётных точек
-        self.nodes = np.mgrid[0:size-1:np.complex(size), 0:size-1:np.complex(size), 0:size-1:np.complex(size)]
+        self.nodes = np.mgrid[0:size-1:complex(size), 0:size-1:complex(size), 0:size-1:complex(size)]
         self.nodes *= step
 
         # Модельная скалярная величина распределена как-то вот так

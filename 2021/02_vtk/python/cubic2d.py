@@ -8,7 +8,7 @@ class CalcMesh:
     # Конструктор сетки size x size точек с шагом h по пространству
     def __init__(self, size, step):
         # 2D-сетка из расчётных точек, у каждой из которых, тем не менее, 3 координаты
-        self.nodes = np.mgrid[0:size-1:np.complex(size), 0:size-1:np.complex(size)]
+        self.nodes = np.mgrid[0:size-1:np.complex128(size), 0:size-1:np.complex128(size)]
         self.nodes *= step
         self.nodes = np.append(self.nodes, [np.zeros(shape=(size, size), dtype=np.double)], 0)
 

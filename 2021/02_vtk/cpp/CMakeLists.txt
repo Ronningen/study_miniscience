@@ -15,8 +15,8 @@ include(${VTK_USE_FILE})
 # gmsh укажем явно по кусочкам (потому что он был просто распакован руками)
 add_library(gmsh SHARED IMPORTED)
 set_target_properties(gmsh PROPERTIES
-    IMPORTED_LOCATION "/home/anganar/gmsh-4.7.1-Linux64-sdk/lib/libgmsh.so"
-    INTERFACE_INCLUDE_DIRECTORIES "/home/anganar/gmsh-4.7.1-Linux64-sdk/include"
+    IMPORTED_LOCATION "/opt/homebrew/Cellar/gmsh/4.11.1/lib/libgmsh.4.11.1.dylib"
+    INTERFACE_INCLUDE_DIRECTORIES "/opt/homebrew/Cellar/gmsh/4.11.1/include/"
 )
 set(GMSH_LIBRARY gmsh)
 
