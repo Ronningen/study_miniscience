@@ -8,7 +8,7 @@
 **/trash
 .vscode
 CMakeFiles/
-**.txt
+CMakeCache.txt
 2021/*
 out_gmsh/
 *.c
