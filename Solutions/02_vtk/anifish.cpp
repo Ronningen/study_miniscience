@@ -34,16 +34,18 @@ protected:
     double _vx;
     double _vy;
     double _vz;
+    // Скалярное поле для окраски
+    double scalar;
 
 public:
     // Конструктор по умолчанию
-    CalcNode() : x(0.0), y(0.0), z(0.0), smth(0.0), vx(0.0), vy(0.0), vz(0.0)
+    CalcNode() : x(0.0), y(0.0), z(0.0), smth(0.0), vx(0.0), vy(0.0), vz(0.0), scalar(0.0)
     {
     }
 
     // Конструктор с указанием всех параметров
-    CalcNode(double x, double y, double z, double smth, double vx, double vy, double vz) 
-            : x(x), y(y), z(z), smth(smth), vx(vx), vy(vy), vz(vz)
+    CalcNode(double x, double y, double z, double smth, double vx, double vy, double vz, double scalar) 
+            : x(x), y(y), z(z), smth(smth), vx(vx), vy(vy), vz(vz), scalar(scalar)
     {
     }
 };
@@ -85,7 +87,7 @@ public:
             double pointZ = nodesCoords[i*3 + 2];
             // Скалярная велечина - средний радиус движения каждой точки  
             double smth = pow(pointX - X0, 2) + pow(pointY-Y0, 2);
-            nodes[i] = CalcNode(pointX, pointY, pointZ, smth, 0.0, 0.0, 0.0);
+            nodes[i] = CalcNode(pointX, pointY, pointZ, smth, 0.0, 0.0, 0.0, 1);
         }
 
         // Пройдём по элементам в модели gmsh
@@ -100,7 +102,7 @@ public:
 
     // Метод отвечает за выполнение для всей сетки шага по времени величиной tau
     void doTimeStep(double tau) {
-        // По сути метод просто двигает все точки
+        // Двигает все точки методом Хеуна на месте перерасчитывая скорости
         for(unsigned int i = 0; i < nodes.size(); i++) {
             double angle = atan2((nodes[i].y-Y0),(nodes[i].x-X0));
             nodes[i].vx = A * N * sin(N*angle) * cos(angle) + (nodes[i].smth + A * cos(N*angle)) * sin(angle);
@@ -112,6 +114,8 @@ public:
             double vy_ = A * N * sin(N*angle_) * sin(angle_) - (nodes[i].smth + A * cos(N*angle_)) * cos(angle_);
             nodes[i].x += tau*(nodes[i].vx + vx_)/2 * sqrt(nodes[0].smth/nodes[i].smth);
             nodes[i].y += tau*(nodes[i].vy + vy_)/2 * sqrt(nodes[0].smth/nodes[i].smth);
+            // Обновляет скалярное поле
+            nodes[i].scalar += tau*sin(20*angle);
         }
     }
 
@@ -141,7 +145,7 @@ public:
             vel->InsertNextTuple(_vel);
 
             // И значение скалярного поля тоже
-            smth->InsertNextValue(nodes[i].smth);
+            smth->InsertNextValue(nodes[i].scalar);
         }
 
         // Грузим точки в сетку

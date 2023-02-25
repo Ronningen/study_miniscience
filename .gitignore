@@ -9,3 +9,11 @@
 .vscode
 CMakeFiles/
 **.txt
+2021/*
+out_gmsh/
+*.c
+*.h
+Makefile
+*.cmake
+*.pvtu
+Solutions/03_fenics/poisson
