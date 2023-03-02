@@ -117,16 +117,13 @@ int main(int argc, char* argv[])
   loguru::set_thread_name(thread_name.c_str());
 
   {
-    auto mesh = std::make_shared<mesh::Mesh>(
-        mesh::create_box(MPI_COMM_WORLD, {{{0.0, 0.0, 0.0}, {1.0, 1.0, 5.0}}},
-                         {10, 10, 50}, mesh::CellType::tetrahedron,
-                         mesh::create_cell_partitioner(mesh::GhostMode::none)));
-
-    // auto file = dolfinx::io::XDMFFile(MPI_COMM_WORLD, "Solutions/trash/fish.xdmf", "r");
-    // const auto mesh = std::make_shared<mesh::Mesh>(
-    //     file.read_mesh(fem::CoordinateElement(mesh::CellType::tetrahedron, 1), mesh::GhostMode::shared_facet, "fish"));
-    // mesh->topology().create_connectivity(3, 2);
-    // file.close();
+    auto file = dolfinx::io::XDMFFile(MPI_COMM_WORLD, "Solutions/trash/fish.xdmf", "r");
+    const auto mesh = std::make_shared<mesh::Mesh>(
+        file.read_mesh(fem::CoordinateElement(mesh::CellType::tetrahedron, 1), mesh::GhostMode::shared_facet, "fish"));
+    auto cell_markers = file.read_meshtags(mesh, "fish_cells");
+    mesh->topology().create_connectivity(3, 2);
+    auto facet_markers = file.read_meshtags(mesh, "fish_facets");
+    file.close();
 
     auto V = std::make_shared<fem::FunctionSpace>(fem::create_functionspace(
         functionspace_form_hyperelasticity_F_form, "u", mesh));
@@ -141,11 +138,7 @@ int main(int argc, char* argv[])
     u_rotation->interpolate(
         [](auto x) -> std::pair<std::vector<T>, std::vector<std::size_t>>
         {
-          constexpr double scale = 0.5;
-
-          constexpr double c = 0.005;
-
-          // constexpr double theta = 1.04719755;
+          constexpr double scale = 0.005;
 
           std::vector<double> fdata(3 * x.extent(1), 0.0);
           namespace stdex = std::experimental;
@@ -154,14 +147,8 @@ int main(int argc, char* argv[])
               f(fdata.data(), 3, x.extent(1));
           for (std::size_t p = 0; p < x.extent(1); ++p)
           {
-            // double x1 = x(1, p);
-            // double x2 = x(2, p);
-            // f(1, p) = scale
-            //           * (x1_c + (x1 - x1_c) * std::cos(theta)
-            //              - (x2 - x2_c) * std::sin(theta) - x1);
-            f(0, p) = scale * (c - x(1, p));
-            f(1, p) = -scale * (c - x(0, p));
-            f(2, p) = -x(0, p);
+            f(0, p) = scale*(-sin(scale)*x(0, p) - cos(scale)*x(1,p));
+            f(1, p) = scale*(cos(scale)*x(0, p) - sin(scale)*x(1,p));
           }
 
           return {std::move(fdata), {3, x.extent(1)}};
@@ -172,12 +159,12 @@ int main(int argc, char* argv[])
         {*V},
         [](auto x)
         {
-          constexpr double eps = 1.0e-8;
+          constexpr double eps = 1.0e-1;
           std::vector<std::int8_t> marker(x.extent(1), false);
           for (std::size_t p = 0; p < x.extent(1); ++p)
           {
-            if (std::abs(x(2, p)) < eps)
-              marker[p] = true;
+            double z0 = x(2, p);
+            marker[p] = (std::abs(z0 - 0.9) < eps);
           }
           return marker;
         });
@@ -185,12 +172,12 @@ int main(int argc, char* argv[])
         {*V},
         [](auto x)
         {
-          constexpr double eps = 1.0e-8;
+          constexpr double eps = 1.0e-1;
           std::vector<std::int8_t> marker(x.extent(1), false);
           for (std::size_t p = 0; p < x.extent(1); ++p)
           {
-            if (std::abs(x(2, p) - 5) < eps)
-              marker[p] = true;
+            double z0 = x(2, p);
+            marker[p] = (std::abs(z0+0.9) < eps);
           }
           return marker;
         });
@@ -227,7 +214,7 @@ int main(int argc, char* argv[])
     sigma.interpolate(sigma_expression);
 
     // Save solution in VTK format
-    io::VTKFile file_u(mesh->comm(), "u.pvd", "w");
+    io::VTKFile file_u(mesh->comm(), "uh.pvd", "w");
     file_u.write<T>({*u}, 0.0);
 
     //Save Cauchy stress in XDMF format

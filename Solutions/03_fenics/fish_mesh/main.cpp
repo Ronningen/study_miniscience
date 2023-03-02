@@ -34,23 +34,28 @@ int main(int argc, char* argv[])
     auto L = std::make_shared<fem::Form<T>>(fem::create_form<T>(
         *form_poisson_L, {V}, {{"f", f}, {"g", g}}, {}, {}));
 
-    // const auto bdofs = fem::locate_dofs_topological({*V}, 3, facet_markers.indices());
     auto facets = mesh::locate_entities_boundary(
         *mesh, 2,
         [](auto x)
         {
+          constexpr double eps = 1.0e-1;
           std::vector<std::int8_t> marker(x.extent(1), false);
+          for (std::size_t p = 0; p < x.extent(1); ++p)
+          {
+            double z0 = x(2, p);
+            marker[p] = (std::abs(z0+0.9) < eps or std::abs(z0 - 0.9) < eps);
+          }
           return marker;
         });
     const auto bdofs = fem::locate_dofs_topological({*V}, 2, facets);
-    auto bc = std::make_shared<const fem::DirichletBC<T>>(0.0, bdofs, V);
+    auto bc = std::make_shared<const fem::DirichletBC<T>>(1.0, bdofs, V);
 
     f->interpolate(
         [](auto x) -> std::pair<std::vector<T>, std::vector<std::size_t>>
         {
           std::vector<T> f;
           for (std::size_t p = 0; p < x.extent(1); ++p)
-            f.push_back(10);
+            f.push_back(pow(2, -(x(0, p)*x(0, p) + x(1, p)*x(1, p))));
 
           return {f, {f.size()}};
         });
