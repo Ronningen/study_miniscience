@@ -18,3 +18,5 @@ Makefile
 *.pvtu
 Solutions/03_fenics/hyperelasticity/demo_hyperelasticity
 Solutions/03_fenics/fish_mesh/poisson
+oldfenics
+dolfin

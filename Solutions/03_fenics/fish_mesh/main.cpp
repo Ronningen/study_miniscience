@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     const auto bdofs = fem::locate_dofs_topological({*V}, 2, facets);
     auto bc = std::make_shared<const fem::DirichletBC<T>>(1.0, bdofs, V);
 
-    f->interpolate(
+    g->interpolate(
         [](auto x) -> std::pair<std::vector<T>, std::vector<std::size_t>>
         {
           std::vector<T> f;
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
           return {f, {f.size()}};
         });
-    g->interpolate(
+    f->interpolate(
         [](auto x) -> std::pair<std::vector<T>, std::vector<std::size_t>>
         {
           std::vector<T> f;
