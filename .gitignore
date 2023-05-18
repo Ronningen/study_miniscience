@@ -21,3 +21,4 @@ Solutions/03_fenics/fish_mesh/poisson
 oldfenics
 dolfin
 store
+.DS_Store
